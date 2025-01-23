@@ -5,6 +5,7 @@ import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import { GenerateSW } from 'workbox-webpack-plugin';
 import fastGlob from 'fast-glob';
 import process from 'node:process';
+import CopyWebpackPlugin from 'copy-webpack-plugin'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const isProduction = process.env.NODE_ENV === 'production';
@@ -17,6 +18,7 @@ const config = {
   output: {
     path: path.resolve(__dirname, 'dist'), // РљСѓРґРё Р·Р±РµСЂС–РіР°С‚Рё СЂРµР·СѓР»СЊС‚Р°С‚
     filename: '[name].js', // Р¦Рµ РґР»СЏ JS, СЏРєС‰Рѕ РІС–РЅ РїРѕС‚СЂС–Р±РµРЅ
+    clean: true,
   },
   mode: isProduction ? 'production' : 'development',
   devtool: 'source-map',
@@ -26,8 +28,22 @@ const config = {
     hot: true,
     port: 8080,
     watchFiles: ['./src/**/*'],
+    static: {
+      directory: path.resolve('src/static')
+    }
   },
   plugins: [
+
+    new CopyWebpackPlugin({
+      patterns: [
+        {
+          from: path.resolve('src/static'),
+          to: path.resolve('dist/static'),
+          noErrorOnMissing: true,
+        }
+      ]
+    }),
+
     // РџРµСЂРµРІС–СЂСЏС”РјРѕ, С‡Рё РїСЂР°РІРёР»СЊРЅРѕ РїС–РґРєР»СЋС‡Р°С”РјРѕ HtmlWebpackPlugin РґР»СЏ РєРѕР¶РЅРѕРіРѕ С€Р°Р±Р»РѕРЅСѓ
     ...pages.map(
       (page) =>
